@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+    
+    stages{
+        stage("clone code"){
+            steps{
+                echo "clone code from git "
+                git url:"https://github.com/Arima2002/django-notes-app.git", branch: "main"
+            }
+        }
+        stage("build image"){
+            steps{
+                echo "build the image"
+                sh "docker build -t my-notes-app ."
+            }
+        }
+        stage("push image"){
+            steps{
+                echo "push image into docker hub"
+                 withCredentials([usernamePassword(credentialsId: "dockerHub", passwordVariable: "dockerHubPass", usernameVariable: "dockerHubUser")]) {
+                 sh "docker login -u $dockerHubUser -p $dockerHubPass"
+                 sh "docker tag my-notes-app $dockerHubUser/my-notes-app"
+                 sh "docker push $dockerHubUser/my-notes-app"
+                 }
+            }
+        }
+        stage("deploy"){
+            steps{
+                echo "deploy docker container"
+                sh "docker-compose down && docker-compose up -d "
+            }
+        }
+        
+    }
+}
