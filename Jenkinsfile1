@@ -28,7 +28,7 @@ pipeline {
             steps{
                 echo "deploy docker container"
                 sh "docker rm -f my-notes-app || true"
-                sh "docker run -d -p 4000:4000 my-notes-app"
+                sh "docker run -d -p 4001:4000 my-notes-app"
             }
         }
         
